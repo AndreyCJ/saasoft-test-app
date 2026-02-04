@@ -100,7 +100,7 @@ const handleTypeChange = (value: string) => {
   }
 };
 
-const saveToStore = () => {
+const submitForm = () => {
   if (!validateForm()) return;
 
   const accountData: Account = {
@@ -138,27 +138,38 @@ onMounted(() => {
     <div class="account-item__wrapper border rounded-lg p-4 mb-3 bg-card">
       <!-- Метка -->
       <div class="account-item__col">
-        <div class="flex items-center gap-2 mb-2">
-          <BaseLabel for="label">Метка</BaseLabel>
-        </div>
+        <BaseLabel class="account-item__label" for="label">Метка</BaseLabel>
         <BaseInput
           id="label"
           v-model="localAccount.labelString"
+          :class="[
+            'account-item__input',
+            {
+              'account-item__input--error': errors.label,
+            },
+          ]"
           type="text"
           placeholder="Метки через ;"
           :maxlength="50"
-          class="w-full"
-          :class="{ 'border-red-500': errors.label }"
-          @blur="validateField('label')"
+          @blur="submitForm"
         />
-        <p v-if="errors.label" class="text-xs text-red-500 mt-1">Максимум 50 символов</p>
+        <p v-if="errors.label" class="account-item__error-msg">Максимум 50 символов</p>
       </div>
 
       <!-- Тип записи -->
       <div class="account-item__col">
-        <BaseLabel for="type" class="block mb-2">Тип записи</BaseLabel>
-        <BaseSelect id="type" v-model="localAccount.type">
-          <SelectTrigger :class="{ 'border-red-500': errors.type }">
+        <BaseLabel for="type" class="account-item__label">Тип записи</BaseLabel>
+        <BaseSelect
+          id="type"
+          v-model="localAccount.type"
+          :class="[
+            'account-item__input',
+            {
+              'account-item__input--error': errors.type,
+            },
+          ]"
+        >
+          <SelectTrigger>
             <SelectValue placeholder="Выберите тип" />
           </SelectTrigger>
           <SelectContent>
@@ -166,41 +177,50 @@ onMounted(() => {
             <SelectItem value="Локальная">Локальная</SelectItem>
           </SelectContent>
         </BaseSelect>
-        <p v-if="errors.type" class="text-xs text-red-500 mt-1">Обязательное поле</p>
+        <p v-if="errors.type" class="account-item__error-msg">Обязательное поле</p>
       </div>
 
       <!-- Логин -->
       <div class="account-item__col">
-        <BaseLabel for="login" class="block mb-2">Логин *</BaseLabel>
+        <BaseLabel for="login" class="account-item__label">Логин *</BaseLabel>
         <BaseInput
-          id="login"
           v-model="localAccount.login"
+          id="login"
+          :class="[
+            'account-item__input',
+            {
+              'account-item__input--error': errors.login,
+            },
+          ]"
           type="text"
           placeholder="Введите логин"
           :maxlength="100"
-          class="w-full"
-          :class="{ 'border-red-500': errors.login }"
-          @blur="saveToStore"
+          @blur="submitForm"
         />
-        <p v-if="errors.login" class="text-xs text-red-500 mt-1">
+        <p v-if="errors.login" class="account-item__error-msg">
           {{ errors.login }}
         </p>
       </div>
 
       <!-- Пароль (показывается только для "Локальная") -->
       <div v-if="localAccount.type === 'Локальная'" class="account-item__col">
-        <BaseLabel for="password">Пароль *</BaseLabel>
+        <BaseLabel for="password" class="account-item__label">Пароль *</BaseLabel>
         <BaseInput
-          id="password"
           v-model="localAccount.password"
+          :class="[
+            'account-item__input',
+            {
+              'account-item__input--error': errors.password,
+            },
+          ]"
+          id="password"
+          variant="password"
           type="password"
           placeholder="Введите пароль"
           :maxlength="100"
-          class="w-full"
-          :class="{ 'border-red-500': errors.password }"
-          @blur="saveToStore"
+          @blur="submitForm"
         />
-        <p v-if="errors.password" class="text-xs text-red-500 mt-1">
+        <p v-if="errors.password" class="account-item__error-msg">
           {{ errors.password }}
         </p>
       </div>
@@ -237,7 +257,18 @@ onMounted(() => {
   &__col {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.4rem;
+  }
+
+  &__error-msg {
+    color: var(--color-red-500);
+    font-size: 0.7rem;
+  }
+
+  &__input {
+    &--error {
+      border-color: var(--color-red-500);
+    }
   }
 
   &__remove-btn {
